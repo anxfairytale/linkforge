@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless URL shortener using HTTP API, Lambda, DynamoDB and S3 static website hosting.
+Parameters:
+  FrontendBucketName:
+    Type: String
+    Description: Globally unique S3 bucket name for the static website.
+  FrontendOrigin:
+    Type: String
+    Description: Exact S3 website origin (for example http://bucket.s3-website-us-east-1.amazonaws.com).
+    Default: '*'
+    AllowedPattern: '^\*|https?://[^/]+$'
+  StageName:
+    Type: String
+    Default: '$default'
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 10
+    MemorySize: 128
+    Tracing: Active
+    LoggingConfig:
+      LogFormat: JSON
+Resources:
+  UrlTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: shortCode
+          AttributeType: S
+      KeySchema:
+        - AttributeName: shortCode
+          KeyType: HASH
+      SSESpecification:
+        SSEEnabled: true
+  ShortenerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UrlTable
+          FRONTEND_ORIGIN: !Ref FrontendOrigin
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+              Resource: !GetAtt UrlTable.Arn
+      Events:
+        Shorten:
+          Type: HttpApi
+          Properties:
+            Path: /shorten
+            Method: POST
+        Redirect:
+          Type: HttpApi
+          Properties:
+            Path: /r/{shortCode}
+            Method: GET
+        Stats:
+          Type: HttpApi
+          Properties:
+            Path: /stats/{shortCode}
+            Method: GET
+        Health:
+          Type: HttpApi
+          Properties:
+            Path: /health
+            Method: GET
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref StageName
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref FrontendOrigin
+        AllowHeaders:
+          - Content-Type
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        MaxAge: 600
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Ref FrontendBucketName
+      WebsiteConfiguration:
+        IndexDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+  FrontendReadPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadWebsiteAssets
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub '${FrontendBucket.Arn}/*'
+Outputs:
+  ApiBaseUrl:
+    Description: API Gateway base URL
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}'
+  FrontendBucketName:
+    Value: !Ref FrontendBucket
+  FrontendWebsiteUrl:
+    Description: HTTP-only S3 website endpoint
+    Value: !GetAtt FrontendBucket.WebsiteURL
+  ShortenerTableName:
+    Value: !Ref UrlTable
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,18 @@
+﻿# Secrets and local environment
+.env
+.env.*
+!.env.example
+.aws-sam/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# AWS credentials
+.aws/
+credentials
+config
+
+# Generated and local files
+.DS_Store
+Thumbs.db

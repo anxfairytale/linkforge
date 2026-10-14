@@ -1,0 +1,2 @@
+# boto3 is included in the AWS Lambda Python runtime; listed for local use.
+boto3>=1.34,<2

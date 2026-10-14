@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101827"><meta name="description" content="Create short links and view real click statistics with an AWS serverless URL shortener.">
+  <title>Linkforge — AWS URL Shortener</title><link rel="stylesheet" href="style.css">
+  <script src="config.js"></script><script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./" aria-label="Linkforge home"><span class="brand-mark">↗</span> LINKFORGE</a><span class="service-tag"><i></i> AWS SERVERLESS</span></header>
+  <main class="layout">
+    <section class="intro"><p class="eyebrow">A SMALL LINK. A BIG CLOUD.</p><h1>Make long links<br><em>go further.</em></h1><p class="lede">Create a shareable short link in seconds. Every visit is counted in real time.</p>
+      <div class="architecture"><span>YOUR LINK</span><b>→</b><span>API GATEWAY</span><b>→</b><span>LAMBDA + DYNAMODB</span></div>
+    </section>
+    <section class="panel" aria-labelledby="formTitle"><div class="panel-heading"><div><p class="eyebrow">LINK WORKSPACE</p><h2 id="formTitle">Shorten a URL</h2></div><span class="step">01 / CREATE</span></div>
+      <form id="shortenForm" novalidate><label for="longUrlInput">Destination URL</label><div class="url-entry"><span aria-hidden="true">⌁</span><input id="longUrlInput" type="url" placeholder="https://example.com/your/very/long/link" autocomplete="url" required maxlength="2048"><button id="shortenBtn" type="submit">Shorten link <span aria-hidden="true">↗</span></button></div>
+      <p class="hint">Use a complete HTTP or HTTPS address.</p><p id="formMessage" class="message" role="status" aria-live="polite"></p></form>
+    </section>
+    <section id="resultCard" class="panel result" hidden><div class="panel-heading"><div><p class="eyebrow">READY TO SHARE</p><h2>Your short link</h2></div><span class="badge">● LIVE</span></div>
+      <div class="result-row"><input id="shortUrlOutput" aria-label="Generated short URL" readonly><button id="copyBtn" class="quiet">Copy</button><a id="openLink" class="open-link" target="_blank" rel="noopener noreferrer" aria-label="Open short link in new tab">↗</a></div><p id="copyMessage" class="message" role="status" aria-live="polite"></p>
+    </section>
+    <section id="analyticsCard" class="panel analytics" hidden><div class="panel-heading"><div><p class="eyebrow">LIVE TELEMETRY</p><h2>Link activity</h2></div><button id="refreshBtn" class="quiet">↻ Refresh</button></div>
+      <div class="click-metric"><strong id="statClicks">—</strong><span>total visits</span></div>
+      <dl class="stats"><div><dt>SHORT CODE</dt><dd id="statShortCode">—</dd></div><div><dt>DESTINATION</dt><dd><a id="statLongUrl" target="_blank" rel="noopener noreferrer">—</a></dd></div><div><dt>CREATED</dt><dd id="statCreatedAt">—</dd></div></dl>
+      <p id="analyticsMessage" class="message" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <footer><span>LINKFORGE <b>·</b> A SERVERLESS URL SHORTENER</span><span>POWERED BY <b>AMAZON WEB SERVICES</b></span></footer>
+</body></html>
