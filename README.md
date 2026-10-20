@@ -1,6 +1,6 @@
 # AWS URL Shortener
 
-A demo-ready, serverless URL shortener. Create a link, open it for an HTTP 302 redirect, and read its DynamoDB-backed click count. The frontend is plain HTML/CSS/JavaScript; SAM provisions the HTTP API, Python Lambda, on-demand DynamoDB table, and static website bucket.
+A demo-ready, serverless URL shortener. Create a link, open it for an HTTP 302 redirect, and read its DynamoDB-backed click count. The frontend is plain HTML/CSS/JavaScript, SAM provisions the HTTP API, Python Lambda, on-demand DynamoDB table, and static website bucket.
 
 ## Features
 
